@@ -8,6 +8,7 @@ module.exports = {
     async execute(interaction) {
         const channelData = await readSelectedChannelData();
         const timingDataString = await readSelectedDuration();
+        const question = await readSelectedQuestion();
         const timingData = parseInt(String(timingDataString));
         const timingDataInMinutes = timingData / 60000;
 
@@ -18,7 +19,7 @@ module.exports = {
             var randomMemberIds = [];
 
             if (memberIds.length >= minimumAmountOfPeople) {
-                interaction.reply("Successfully started with " + memberIds.length + " people! The duration of this CoffeeTalk is set to " + timingDataInMinutes + " minutes!");
+                interaction.reply("Successfully started with " + memberIds.length + " people! The question for this round is " + question + ". The duration of this CoffeeTalk is set to " + timingDataInMinutes + " minutes!");
                 createChannels(interaction, memberIds).then(channelIds => {
                     randomMemberIds = shuffleMemberIds(memberIds);
                     moveMembers(interaction, randomMemberIds, channelIds);
@@ -54,6 +55,18 @@ function readSelectedDuration() {
             }
             resolve(milliseconds);
         });
+    })
+}
+
+function readSelectedQuestion() {
+    return new Promise(resolve => {
+        fs.readFile('./configuration/selected-question.txt', 'utf8', function (err, data) {
+            var question = "No specific question for this round"
+            if (err === null) {
+                question = data;
+            }
+            resolve(question);
+        })
     })
 }
 
